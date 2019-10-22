@@ -19,6 +19,7 @@ int main()
     cout<<"2. View your tasks"<<endl;
     cout << "3. Modify your tasks"<<endl;
     cout << "4. EXIT" <<endl;
+     //Delete task     delete line in file
     cout << "What do u want: "; cin >> choice;
     fstream file;
     switch(choice){
