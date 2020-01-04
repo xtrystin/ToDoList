@@ -20,6 +20,7 @@ void check_error()            // if wrong input
 }
 void Display()
 {
+    cout << "Topic  Date  Difficulty  Describtion \n";
     fstream Dfile;
     system("cls");
     Dfile.open("database.txt");
@@ -51,41 +52,115 @@ void DisplayXline(int DtaskNr)
         cout << "ERROR";
         exit(0);
     }
-    string line;
+    string line[100];
     int lineNr = 0;
     int option;
-    int firstSpace, secondSpace, thirdSpace;
+    size_t firstSpace, secondSpace, thirdSpace;
+    string newTopic, newDate, newDescribtion;
+    int newDifficulty;
+    size_t lineSize;
     //string X;
    
-    while (getline(file, line))
+    while (getline(file, line[lineNr]))
     {
-        lineNr++;
-       
-            if (lineNr == DtaskNr)
+        
+        cout << line[lineNr] << endl;
+            if (lineNr+1 == DtaskNr)        // +1 because line[] start from [0]
             {
-                cout << line <<endl;
-                //line = "NEW LINE";
-                //cout << line << endl;
+                cout <<"TO  " << line[lineNr] <<endl;
+              
+                cout << "What do u want to modify (Topic = 1, Date = 2, Difficulty = 3, Describtion = 4, EXIT = 5): ";
+                cin >> option;  check_error();  
+                    
+                firstSpace = line[lineNr].find("  ");                   //USEFUL do policzenia odlegnosci do  seekg()
+                secondSpace = line[lineNr].find("  ", firstSpace + 1);      //USEFUL
+                thirdSpace = line[lineNr].find("  ", secondSpace + 1);      //USEFUL
 
-                //cout << "What do u want to modify (Topic = 1, Date = 2, Difficulty= 3): ";
-                //cin >> option;
-                firstSpace = line.find("  ");
-                secondSpace = line.find("  ", firstSpace + 1);
-                thirdSpace = line.find("  ", secondSpace + 1);
+                cout << firstSpace << endl;         
+                cout << secondSpace << endl;        
+                cout << thirdSpace <<endl;      
 
-                cout << firstSpace << endl;
-                cout << secondSpace << endl;
-                cout << thirdSpace <<endl;
+                switch (option)
+                {
+                case 1:
+                    lineSize = line[lineNr].size();
+                    cout << "Write a new topic for your task:  ";
+                    cin >> newTopic;    check_error();
+                    line[lineNr].erase(0,firstSpace);
+                    line[lineNr].insert(0, newTopic);
+                    cout << line[lineNr]<<endl;
+                    
+                   // cout << file.tellg() << endl;
+                   // file.seekg(20);
+                   // file << line;
+                   // cout << line << endl;
+                    break;
+                case 2:
 
+                    break;
+                case 3:
+
+                    break;
+                case 4:
+
+                    break;
+                case 5:
+                    break;
+                default:
+                    cout << "Error";
+                }
+                
+
+
+                
                // return line;
             }
+        lineNr++;
     }
-
-
+    string newFile;
+    for (int i = 0; i < lineNr; i++)
+    {
+        newFile += line[i] + "\n";
+    }
+    cout << newFile;
+    // SAVE TO FILE
+    
+                //if wrong task number WRITE CODE
     getchar(); getchar();
     file.close();
 }
+void Delete(int taskNr)
+{
+    fstream file;
+    file.open("database.txt");
+    if (file.fail())
+    {
+        cout << "ERROR";
+        exit(0);
+    }
+    string line[100];
+    int lineNr = 0;
+    string newFile;
+    while (getline(file, line[lineNr]))
+    {
+        
+        lineNr++;
+        //cout << c << endl;
+    }
+    for (int i = 0; i < lineNr; i++)
+    {
+        if (i+1 != taskNr)
+            newFile += line[i] + "\n";
+    }
+    //cout << newFile << endl;
+    file.close();
+    
+    file.open("database.txt", ios::out | ios::trunc);
+    file << newFile;
+    file.close();
 
+    system("pause");
+}
 int main()
 {
 
@@ -96,6 +171,7 @@ int main()
     string line;
     int taskNr;
     string describtion;
+    int taskD;
   
 
     while(true){
@@ -139,7 +215,7 @@ int main()
         case 2:
 
             Display();
-            cout << "Click anything to continue!";
+            cout << "Click anything to exit";
             getchar(); getchar();
 
 
@@ -148,7 +224,7 @@ int main()
             cout<< "Modify"<<endl;
             Display();
             cout << "Choose task number: ";
-            cin >> taskNr;
+            cin >> taskNr;  check_error();
             DisplayXline(taskNr);
            
             
@@ -157,6 +233,11 @@ int main()
         break;
         case 4:
             cout << "DELETE"<<endl;
+            Display();
+            cout << "Choose task number: ";
+            cin >> taskD; check_error();
+            Delete(taskD);
+
         break;
         case 5:
             exit(0);
@@ -169,6 +250,13 @@ int main()
     system("cls");
 
     }
+
+
+
+
+
+
+
 
 
 
