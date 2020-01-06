@@ -18,36 +18,36 @@ void check_error()            // if wrong input
     }
 
 }
-void Display()
+int Display()
 {
-    cout << "Topic  Date  Difficulty  Describtion \n";
+    
+    cout << "Nr Topic  Date  Difficulty  Describtion \n";
     fstream Dfile;
-    system("cls");
     Dfile.open("database.txt");
-    if (Dfile.fail())   // change to !good()
+    if (!Dfile.good())   // change to !good()
     {
         cout << "ERROR";
-        return;
+        return 0;
     }
 
-    //int line_number=1;
     string line;
     int Linenumber = 0;
     while (!Dfile.eof())
     {
         Linenumber++;
         getline(Dfile, line);
-        if (!Dfile.eof())   // musi byc
+        if (!Dfile.eof())   // necessary    
             cout << Linenumber << ". " << line << endl;
     }
 
     Dfile.close();
+    return 1;
 }
 void DisplayXline(int DtaskNr)
 {
     fstream file;
     file.open("database.txt");
-    if (file.fail())
+    if (!file.good())
     {
         cout << "ERROR";
         exit(0);
@@ -56,9 +56,10 @@ void DisplayXline(int DtaskNr)
     int lineNr = 0;
     int option;
     size_t firstSpace, secondSpace, thirdSpace;
-    string newTopic, newDate, newDescribtion, newDifficulty;
-    size_t lineSize, dateLength, diffLength;
-    //string X;
+    string newTopic, newDate, newDifficulty, newDescribtion;
+    size_t lineSize, dateLength, diffLength, descrLength;
+    string lastLetter;
+    size_t lastLetterPosition;
 
     while (getline(file, line[lineNr]))
     {
@@ -66,24 +67,24 @@ void DisplayXline(int DtaskNr)
         //cout << line[lineNr] << endl;
         if (lineNr + 1 == DtaskNr)        // +1 because line[] start from [0]
         {
-            cout << "Task to modify: " << line[lineNr] << endl;
+            cout << "Selected task to modify: " << line[lineNr] << endl;
 
             cout << "What do u want to modify (Topic = 1, Date = 2, Difficulty = 3, Describtion = 4, EXIT = 5): ";
             cin >> option;  check_error();
 
-            firstSpace = line[lineNr].find("  ");                   //USEFUL do policzenia odlegnosci do  seekg()
+            firstSpace = line[lineNr].find("  ");                   //USEFUL
             secondSpace = line[lineNr].find("  ", firstSpace + 1);      //USEFUL
             thirdSpace = line[lineNr].find("  ", secondSpace + 1);      //USEFUL
 
 
-            cout << firstSpace << endl;
-            cout << secondSpace << endl;
-            cout << thirdSpace << endl;
+            //cout << firstSpace << endl;
+           // cout << secondSpace << endl;
+           // cout << thirdSpace << endl;
 
             switch (option)
             {
             case 1:
-                lineSize = line[lineNr].size();
+                //lineSize = line[lineNr].size();
                 cout << "Write a new topic for your task:  ";
                 cin >> newTopic;    check_error();
                 line[lineNr].erase(0, firstSpace);
@@ -99,19 +100,19 @@ void DisplayXline(int DtaskNr)
                 break;
             case 2:
                 //Date
-                dateLength = secondSpace - firstSpace -2;   // without 2 spaces
+                dateLength = secondSpace - firstSpace - 2;   // without 2 spaces
                //cout << dateLength << endl;
 
                 cout << "Write a new Date for your task: ";
                 cin >> newDate; check_error();
 
-                line[lineNr].erase(firstSpace + 2,dateLength);
+                line[lineNr].erase(firstSpace + 2, dateLength);
                 line[lineNr].insert(firstSpace + 2, newDate);
                 cout << "Modified task: " << line[lineNr] << endl;
                 break;
             case 3:
                 //Difficulty
-                diffLength = thirdSpace - secondSpace -  2; // without 2 spaces spaceXspace - 2spaces =X
+                diffLength = thirdSpace - secondSpace - 2; // without 2 spaces spaceXspace - 2spaces = X
 
                 cout << "Write a new Difficulty for your task: ";
                 cin >> newDifficulty; check_error();
@@ -124,23 +125,41 @@ void DisplayXline(int DtaskNr)
                 break;
             case 4:
                 //Describtion
-
-
-                //cout << "Modified task: " << line[lineNr] << endl;
+                //lineSize = line[lineNr].find_last_of(qwertyuiopasdfghjklzxcvbnm123456789.);     //find last letter in describtion
+               
+                lastLetter = line[lineNr].back();
+              //  cout << lastLetter << endl;
+                lastLetterPosition = line[lineNr].rfind(lastLetter);
+               // cout << lastLetterPosition<<endl;
+                descrLength = lastLetterPosition - thirdSpace - 1;
+               // cout << descrLength << endl;
+                
+                cout << "Write a new Describtion for your task: ";
+                cin.ignore(100000, '\n');   getline(cin, newDescribtion);   check_error();
+                
+                
+                line[lineNr].erase(thirdSpace + 2, descrLength);
+                line[lineNr].insert(thirdSpace + 2, newDescribtion);
+                cout << "Modified task: " << line[lineNr] << endl;
                 break;
             case 5:
+                return;
                 break;
             default:
                 cout << "Error";
+                return;
             }
 
-
-
-
-            // return line;
         }
         lineNr++;
+        
     }
+    if (DtaskNr > lineNr)
+    {
+        cout << "ERROR \n";
+        return;
+    }
+    //cout << "TEST" << endl;
     string newFile;
     for (int i = 0; i < lineNr; i++)
     {
@@ -155,9 +174,9 @@ void DisplayXline(int DtaskNr)
     file.close();
 
 
-                //if wrong task number WRITE CODE
+    cout << "Click anything to exit \n";
     getchar(); getchar();
-   
+
 }
 void Delete(int taskNr)
 {
@@ -177,6 +196,11 @@ void Delete(int taskNr)
         lineNr++;
         //cout << line[lineNr] << endl;
     }
+    if (taskNr > lineNr)
+    {
+        cout << "ERROR \n";
+        return;
+    }
     for (int i = 0; i < lineNr; i++)
     {
         if (i + 1 != taskNr)
@@ -190,7 +214,8 @@ void Delete(int taskNr)
     file << newFile;
     file.close();
 
-    system("pause");
+    cout << "Click anything to exit";
+    getchar(); getchar();
 }
 int main()
 {
@@ -219,10 +244,10 @@ int main()
         switch (choice) {
         case 1:
             system("cls");
-            cout << "Create new task" << endl;
-            cout << "Topic: ";    cin >> topic;
-            cout << "Date: ";    cin >> date;
-            cout << "Difficulty (1-3): ";    cin >> difficulty;
+            cout << "Create new task (exit = 0)" << endl;
+            cout << "Topic: ";    cin >> topic;     if (topic == "0") break;
+            cout << "Date: ";    cin >> date;       if (date == "0") break;
+            cout << "Difficulty (1-3): ";    cin >> difficulty;     if (difficulty == 0) break;
             if (cin.fail() == 1)
             {
                 cin.clear();
@@ -230,11 +255,9 @@ int main()
                 cout << "ERROR ";
                 break;
             }
-            cout << "Describe a task: ";    cin.ignore(100000, '\n');   getline(cin, describtion);
+            cout << "Describe a task: ";    cin.ignore(100000, '\n');   getline(cin, describtion);      if (describtion == "0") break;
 
-            // SAVE  INTO FILE
-
-
+            // SAVING  INTO FILE
             file.open("database.txt", ios::out | ios::app);
             file << topic << "  " << date << "  " << difficulty << "  " << describtion << endl;
             file.close();
@@ -244,31 +267,32 @@ int main()
 
             break;
         case 2:
-
-            Display();
+            system("cls");
+            if (Display() == 0)
+                break;
             cout << "Click anything to exit";
             getchar(); getchar();
 
 
             break;
         case 3:
-            cout << "Modify" << endl;
-            Display();
-            cout << "Choose task number: ";
-            cin >> taskNr;  check_error();
+            system("cls");
+            cout << "Modify (exit = 0)" << endl;
+            if (Display() == 0)
+                break;
+            cout << "Choose task number: ";    
+            cin >> taskNr;  check_error();      if (taskNr == 0) break;
             DisplayXline(taskNr);
-
-
-
 
             break;
         case 4:
-            cout << "DELETE" << endl;
+            system("cls");
+            cout << "DELETE (exit = 0)" << endl;
             Display();
-            cout << "Choose task number: ";
-            cin >> taskD; check_error();
-            Delete(taskD);
-
+            cout << "Choose task number: ";   
+            cin >> taskD; check_error();        if (taskD == 0) break;
+            Delete(taskD);  
+            // undo option
             break;
         case 5:
             exit(0);
@@ -281,13 +305,6 @@ int main()
         system("cls");
 
     }
-
-
-
-
-
-
-
 
 
 
